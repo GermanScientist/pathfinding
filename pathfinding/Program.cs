@@ -1,12 +1,10 @@
-﻿using System;
-
-namespace pathfinding
+﻿namespace pathfinding
 {
     class Program
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            PathfindingProgram program = new PathfindingProgram();
         }
     }
 }
