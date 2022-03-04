@@ -1,7 +1,8 @@
 ﻿namespace pathfinding {
     class Program {
         static void Main(string[] args) {
-            PathfindingProgram program = new PathfindingProgram();
+            Visualizer visualizer = new Visualizer("Pathfinding");
+            while (visualizer.Run()) { ; }
         }
     }
 }
