@@ -1,4 +1,5 @@
-﻿using Raylib_cs;
+﻿using System;
+using Raylib_cs;
 using System.Collections.Generic;
 
 namespace pathfinding {
@@ -7,8 +8,11 @@ namespace pathfinding {
         private int x; //The x position of the cell
         private int y; //The y position of the cell
 
-        private int width;
-        private int height;
+        private int width; //Cell width
+        private int height; //Cell height
+
+        private bool walkable; //Bool to see whether this tile is walkable or not
+        private float walkablePercentage; //A number between 0 and 1 to see how likely the tile is to become unwalkable
 
         private List<Cell> neighbors;
         private Cell parent;
@@ -21,6 +25,7 @@ namespace pathfinding {
         //The cell positions
         public int X { get { return x; } }
         public int Y { get { return y; } }
+        public bool Walkable { get { return walkable; } set { walkable = value; } }
 
         //A list of this cell's neighboors
         public List<Cell> Neighbors { get { return neighbors; } }
@@ -38,11 +43,18 @@ namespace pathfinding {
             width = _width;
             height = _height;
 
+            //Create an empty list of neighbors
             neighbors = new List<Cell>();
+
+            //Randomly set some tiles as unwalkable
+            Random random = new Random(); //Initialize the random class
+            walkablePercentage = 0.3f;
+            walkable = random.NextDouble() > walkablePercentage ? true : false; //There is a 30% chance of the tile becoming unwalkable
         }
 
         //Draw the cell
         public void DrawCell(Color _cellColor) {
+            if (!walkable) _cellColor = Color.BLACK;
             Raylib.DrawRectangle(x * width, y * height, width, height, _cellColor); //Draw the cell rectangle
             Raylib.DrawRectangleLines(x * width, y * height, width, height, Color.BLACK); //Draw the cell outline
         }

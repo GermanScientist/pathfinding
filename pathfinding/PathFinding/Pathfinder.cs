@@ -23,8 +23,8 @@ namespace pathfinding {
         //The constructor
         public Pathfindinder() {
             //Initialize the properties
-            columnsAmount = 25;
-            rowsAmount = 25;
+            columnsAmount = 50;
+            rowsAmount = 50;
 
             //Set the width and height of the cells depending on the screensize
             cellWidth = (int)Settings.ScreenSize.X / columnsAmount; ;
@@ -57,6 +57,10 @@ namespace pathfinding {
             startCell = grid[0][0]; //Assign the start cell
             finishCell = grid[columnsAmount - 1][rowsAmount - 1]; //Assign the finish cell
 
+            //Make sure the start and finish cells are always walkable
+            startCell.Walkable = true;
+            finishCell.Walkable = true;
+
             openSet.Add(startCell); //Add the start cell to the open set
         }
 
@@ -85,44 +89,47 @@ namespace pathfinding {
                     
                     //Find the path
                     Console.WriteLine("DONE");
-                }
-                    
-                //If the current cell isn't the finish cell, the search hasn't ended yet
-                openSet.Remove(currentCell); //Remove the current cell from the open set
-                closedSet.Add(currentCell); //Add the current cell to the closed set
+                } else { //If the algorythm hasn't finished yet..
+                    //If the current cell isn't the finish cell, the search hasn't ended yet
+                    openSet.Remove(currentCell); //Remove the current cell from the open set
+                    closedSet.Add(currentCell); //Add the current cell to the closed set
 
-                //Add all the neighbors of the current cell to the open set, but first evaluate them
-                List<Cell> neighbors = currentCell.Neighbors; //Get the neighbors of the current cell
-                for(var i = 0; i < neighbors.Count; i++) {
-                    Cell neighbor = neighbors[i]; //Get the current neighbor
+                    //Add all the neighbors of the current cell to the open set, but first evaluate them
+                    List<Cell> neighbors = currentCell.Neighbors; //Get the neighbors of the current cell
+                    for (var i = 0; i < neighbors.Count; i++)
+                    {
+                        Cell neighbor = neighbors[i]; //Get the current neighbor
 
-                    //If the neighbor is in the closed list, it shouldn't be evaluated
-                    if(!closedSet.Contains(neighbor)) {
-                        //If you move to a neighbor, g should increase by the distance between the current cell and the neighbor,
-                        //seeing as g is the cost of getting to the next node
-                        Vector2 currentCellPosition = new Vector2(currentCell.X, currentCell.Y);
-                        Vector2 neighborPosition = new Vector2(neighbor.X, neighbor.Y);
-                        int distanceBetweenCells = (int)Vector2.Distance(currentCellPosition, neighborPosition);
-                        
-                        int temporaryG = currentCell.G + distanceBetweenCells; //Create a temporary g value
+                        //If the neighbor is in the closed list or unwalkable, it shouldn't be evaluated
+                        if (!closedSet.Contains(neighbor) && neighbor.Walkable)
+                        {
+                            //If you move to a neighbor, g should increase by the distance between the current cell and the neighbor,
+                            //seeing as g is the cost of getting to the next node
+                            Vector2 currentCellPosition = new Vector2(currentCell.X, currentCell.Y);
+                            Vector2 neighborPosition = new Vector2(neighbor.X, neighbor.Y);
+                            int distanceBetweenCells = (int)Vector2.Distance(currentCellPosition, neighborPosition);
 
-                        //Check if the neighbor has already been evaluated
-                        if (openSet.Contains(neighbor)) {
-                            //If it has been evaluated, check if the current g is better than the evaluated g
-                            //If the temporary g is better than the neighbor's g, set the neighbor's g to the temporary g
-                            if (temporaryG < neighbor.G) neighbor.G = temporaryG; 
-                        } else {
-                            neighbor.G = temporaryG; //If the neighbor isn't in the open set, set the neighbor's g to the temporary g
-                            openSet.Add(neighbor); //Add the neighbor to the open set
+                            int temporaryG = currentCell.G + distanceBetweenCells; //Create a temporary g value
+
+                            //Check if the neighbor has already been evaluated
+                            if (openSet.Contains(neighbor))
+                            {
+                                //If it has been evaluated, check if the current g is better than the evaluated g
+                                //If the temporary g is better than the neighbor's g, set the neighbor's g to the temporary g
+                                if (temporaryG < neighbor.G) neighbor.G = temporaryG;
+                            }
+                            else
+                            {
+                                neighbor.G = temporaryG; //If the neighbor isn't in the open set, set the neighbor's g to the temporary g
+                                openSet.Add(neighbor); //Add the neighbor to the open set
+                            }
+
+                            neighbor.H = CalculateHeuristic(neighbor, finishCell); //Calculate the neighbor's heuristic
+                            neighbor.F = neighbor.G + neighbor.H; //Calculate the neighbor's total cost
+                            neighbor.Parent = currentCell; //Set the current cell as the neighbor's parent cell
                         }
-
-                        neighbor.H = CalculateHeuristic(neighbor, finishCell); //Calculate the neighbor's heuristic
-                        neighbor.F = neighbor.G + neighbor.H; //Calculate the neighbor's total cost
-                        neighbor.Parent = currentCell; //Set the current cell as the neighbor's parent cell
                     }
                 }
-            }
-            else { //If there is nothing in the open set, there is no solution and stop searching
             }
 
             //Draw the cells of the grid
