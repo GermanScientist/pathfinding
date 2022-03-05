@@ -38,11 +38,6 @@ namespace pathfinding {
                     grid[i].Add(new Cell(i, j, cellWidth, cellHeight)); //Cell(x, y, width, height)
             }
 
-            //Add the neighbors to each of the cells
-            for(int i = 0; i < columnsAmount; i++)
-                for (int j = 0; j < rowsAmount; j++)
-                    grid[i][j].AddNeighbors(grid, columnsAmount, rowsAmount);
-
             //Create empty lists
             openSet = new List<Cell>(); //The open set
             closedSet = new List<Cell>(); //The closed set
@@ -62,17 +57,32 @@ namespace pathfinding {
             finishCell.Walkable = true;
 
             openSet.Add(startCell); //Add the start cell to the open set
+
+            //Give each cell a neighbor
+            for (int i = 0; i < columnsAmount; i++)
+                for (int j = 0; j < rowsAmount; j++)
+                    grid[i][j].AddNeighbors(grid, columnsAmount, rowsAmount);
         }
 
         //Everything in the update function will be updated every frame and able to be drawn in the visualizer
         public override void Update() {
-            //Check if there is anything in the open set
-            if(openSet.Count > 0) { //If there is anything in the open set, continue searching for a path
+            //Find the shortest path using the a* algorythm
+            FindShortestPath();
+            
+            //Draw the cells of the grid
+            DrawCells();
+        }
+
+        //A* pathfinding implementation
+        private void FindShortestPath() {
+            //If there is anything in the open set, continue searching for a path
+            //Otherwise you can stop searching, as everything has been tested already
+            if (openSet.Count > 0) { 
                 int lowestIndex = 0; //The lowest number in the open set is the closest / is the winner
                 for (int i = 0; i < openSet.Count; i++) {
                     //Sets the lowest index (the closest to being correct/the winner) to the lower value
                     //So if i is lower than the lowest index, the lowest index will become i
-                    lowestIndex = openSet[i].F < openSet[lowestIndex].F ? i : lowestIndex; 
+                    lowestIndex = openSet[i].F < openSet[lowestIndex].F ? i : lowestIndex;
                 }
 
                 Cell currentCell = openSet[lowestIndex]; //Set the winning cell as the current cell, as it is first in the list
@@ -82,27 +92,26 @@ namespace pathfinding {
                     //If it has finished, create the final path, by backtracking through all the parents
                     Cell temporaryCell = currentCell;
                     finalPath.Add(temporaryCell);
-                    while(temporaryCell.Parent != null) {
+                    while (temporaryCell.Parent != null) {
                         finalPath.Add(temporaryCell.Parent);
                         temporaryCell = temporaryCell.Parent;
                     }
-                    
+
                     //Find the path
-                    Console.WriteLine("DONE");
-                } else { //If the algorythm hasn't finished yet..
+                    Console.WriteLine("A PATH HAS BEEN FOUND");
+                }
+                else { //If the algorythm hasn't finished yet..
                     //If the current cell isn't the finish cell, the search hasn't ended yet
                     openSet.Remove(currentCell); //Remove the current cell from the open set
                     closedSet.Add(currentCell); //Add the current cell to the closed set
 
                     //Add all the neighbors of the current cell to the open set, but first evaluate them
                     List<Cell> neighbors = currentCell.Neighbors; //Get the neighbors of the current cell
-                    for (var i = 0; i < neighbors.Count; i++)
-                    {
+                    for (var i = 0; i < neighbors.Count; i++) {
                         Cell neighbor = neighbors[i]; //Get the current neighbor
 
                         //If the neighbor is in the closed list or unwalkable, it shouldn't be evaluated
-                        if (!closedSet.Contains(neighbor) && neighbor.Walkable)
-                        {
+                        if (!closedSet.Contains(neighbor) && neighbor.Walkable) {
                             //If you move to a neighbor, g should increase by the distance between the current cell and the neighbor,
                             //seeing as g is the cost of getting to the next node
                             Vector2 currentCellPosition = new Vector2(currentCell.X, currentCell.Y);
@@ -112,14 +121,12 @@ namespace pathfinding {
                             int temporaryG = currentCell.G + distanceBetweenCells; //Create a temporary g value
 
                             //Check if the neighbor has already been evaluated
-                            if (openSet.Contains(neighbor))
-                            {
+                            if (openSet.Contains(neighbor)) {
                                 //If it has been evaluated, check if the current g is better than the evaluated g
                                 //If the temporary g is better than the neighbor's g, set the neighbor's g to the temporary g
                                 if (temporaryG < neighbor.G) neighbor.G = temporaryG;
                             }
-                            else
-                            {
+                            else {
                                 neighbor.G = temporaryG; //If the neighbor isn't in the open set, set the neighbor's g to the temporary g
                                 openSet.Add(neighbor); //Add the neighbor to the open set
                             }
@@ -129,13 +136,11 @@ namespace pathfinding {
                             neighbor.Parent = currentCell; //Set the current cell as the neighbor's parent cell
                         }
                     }
+                    Console.WriteLine("NO PATH HAS YET BEEN FOUND");
                 }
             }
-
-            //Draw the cells of the grid
-            DrawCells();
         }
-        
+
         //Draw the cells of the grid
         private void DrawCells() {
             //Draw the cells
