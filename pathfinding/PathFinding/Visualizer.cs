@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Numerics;
-using Raylib_cs; // Raylib
+using Raylib_cs;
 
 namespace pathfinding {
     class Visualizer {
-        private Vector2 screenSize = new Vector2(400, 400);
         private ProgramBase program;
 
         //The constructor for the visualizer class
         public Visualizer(string _title, ProgramBase _program) {
             program = _program; //Assign the program
-            Raylib.InitWindow((int)screenSize.X, (int)screenSize.Y, _title); //Initialize a window
+            Raylib.InitWindow((int)Settings.ScreenSize.X, (int)Settings.ScreenSize.Y, _title); //Initialize a window
         }
 
         //Run every frame of the window
