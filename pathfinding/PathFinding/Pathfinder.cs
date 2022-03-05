@@ -9,6 +9,7 @@ namespace pathfinding {
         private List<List<Cell>> grid; //The grid list
         private List<Cell> openSet; //Stores a list of nodes that still need to be evaluated
         private List<Cell> closedSet; //Stores a list of all the nodes that have finished being evaluated
+        private List<Cell> finalPath; //The final (shortest) path after the algorythm has finished
 
         private int columnsAmount; //The amount of columns (horizontally)
         private int rowsAmount; //The amount of rows (vertically)
@@ -22,8 +23,8 @@ namespace pathfinding {
         //The constructor
         public Pathfindinder() {
             //Initialize the properties
-            columnsAmount = 100;
-            rowsAmount = 100;
+            columnsAmount = 25;
+            rowsAmount = 25;
 
             //Set the width and height of the cells depending on the screensize
             cellWidth = (int)Settings.ScreenSize.X / columnsAmount; ;
@@ -42,10 +43,12 @@ namespace pathfinding {
                 for (int j = 0; j < rowsAmount; j++)
                     grid[i][j].AddNeighbors(grid, columnsAmount, rowsAmount);
 
-            //Create an empty list for the open and closed sets
-            openSet = new List<Cell>();
-            closedSet = new List<Cell>();
+            //Create empty lists
+            openSet = new List<Cell>(); //The open set
+            closedSet = new List<Cell>(); //The closed set
+            finalPath = new List<Cell>(); //The final path after the algorythm has finished
 
+            //Start the setup
             Setup();
         }
 
@@ -71,9 +74,19 @@ namespace pathfinding {
                 Cell currentCell = openSet[lowestIndex]; //Set the winning cell as the current cell, as it is first in the list
 
                 //Check if the pathfinding algorythm has finished
-                if (currentCell == finishCell) 
+                if (currentCell == finishCell) {
+                    //If it has finished, create the final path, by backtracking through all the parents
+                    Cell temporaryCell = currentCell;
+                    finalPath.Add(temporaryCell);
+                    while(temporaryCell.Parent != null) {
+                        finalPath.Add(temporaryCell.Parent);
+                        temporaryCell = temporaryCell.Parent;
+                    }
+                    
+                    //Find the path
                     Console.WriteLine("DONE");
-
+                }
+                    
                 //If the current cell isn't the finish cell, the search hasn't ended yet
                 openSet.Remove(currentCell); //Remove the current cell from the open set
                 closedSet.Add(currentCell); //Add the current cell to the closed set
@@ -105,6 +118,7 @@ namespace pathfinding {
 
                         neighbor.H = CalculateHeuristic(neighbor, finishCell); //Calculate the neighbor's heuristic
                         neighbor.F = neighbor.G + neighbor.H; //Calculate the neighbor's total cost
+                        neighbor.Parent = currentCell; //Set the current cell as the neighbor's parent cell
                     }
                 }
             }
@@ -129,13 +143,16 @@ namespace pathfinding {
             //Look through the closed set
             for (int i = 0; i < closedSet.Count; i++) 
                 closedSet[i].DrawCell(Color.RED); //Draw all the cells in the closed set red
+
+            //Look through the final path
+            for (int i = 0; i < finalPath.Count; i++)
+                finalPath[i].DrawCell(Color.BLUE); //Draw all the cells in the closed set red
         }
 
-        //Calculate the heuristic
+        //Calculate the heuristic using the manhatten distance, as the cell's can only move horizontally and vertically
         private int CalculateHeuristic(Cell _neighbor, Cell _finishCell) {
-            Vector2 neighborPosition = new Vector2(_neighbor.X, _neighbor.Y);
-            Vector2 finishPosition = new Vector2(_finishCell.X, _finishCell.Y);
-            return (int)Vector2.Distance(neighborPosition, finishPosition);
+            int distance = Math.Abs(_neighbor.X - _finishCell.X) + Math.Abs(_neighbor.Y - _finishCell.Y);
+            return distance;
         }
     }
 }

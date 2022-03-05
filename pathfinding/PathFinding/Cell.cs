@@ -11,6 +11,7 @@ namespace pathfinding {
         private int height;
 
         private List<Cell> neighbors;
+        private Cell parent;
 
         //The variables needed for the formula f(n) = g(n) + h(n), n being the next node on the path
         public int F { get; set; } //Total cost of the node
@@ -23,6 +24,7 @@ namespace pathfinding {
 
         //A list of this cell's neighboors
         public List<Cell> Neighbors { get { return neighbors; } }
+        public Cell Parent { get { return parent; } set { parent = value; } }
 
         public Cell(int _x, int _y, int _width, int _height) {
             //The variables needed for the formula f(n) = g(n) + h(n), n being the next node on the path
