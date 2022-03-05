@@ -5,12 +5,12 @@ using Raylib_cs; // Raylib
 namespace pathfinding {
     class Visualizer {
         private Vector2 screenSize = new Vector2(400, 400);
-        private PathfindingProgram pathfinder;
+        private ProgramBase program;
 
         //The constructor for the visualizer class
-        public Visualizer(string _title) {
+        public Visualizer(string _title, ProgramBase _program) {
+            program = _program; //Assign the program
             Raylib.InitWindow((int)screenSize.X, (int)screenSize.Y, _title); //Initialize a window
-            pathfinder = new PathfindingProgram(); //A pointer to the pathfinder class
         }
 
         //Run every frame of the window
@@ -24,7 +24,7 @@ namespace pathfinding {
             //Start drawing (everything between begin and end drawing will be drawn)
             Raylib.BeginDrawing();
                 Raylib.ClearBackground(Color.BLACK); //Clear the background
-                pathfinder.Draw(); //Draw everything made in the pathfinder script
+                program.Update(); //Draw everything made in the pathfinder script
             Raylib.EndDrawing();
 
             return true; //If this method returns true, another loop will start

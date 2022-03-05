@@ -1,11 +1,11 @@
 ﻿using Raylib_cs; // Raylib
 
 namespace pathfinding {
-    class PathfindingProgram {
+    class PathfindingProgram : ProgramBase {
         public PathfindingProgram() { }
 
         //Everything in the draw function will be updated every frame and able to be drawn in the visualizer
-        public void Draw() {
+        public override void Update() {
             //Create a grid of red squares, with a size of 50x50, with a space of 10 units between each cell
             int distance = 10;
             int size = 50;
