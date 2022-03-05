@@ -33,9 +33,9 @@ namespace pathfinding {
         }
 
         //Draw the cell
-        public void DrawCell() {
-            Raylib.DrawRectangle(x * width, y * height, width, height, Color.WHITE);
-            Raylib.DrawRectangleLines(x * width, y * height, width, height, Color.BLACK);
+        public void DrawCell(Color _cellColor) {
+            Raylib.DrawRectangle(x * width, y * height, width, height, _cellColor); //Draw the cell rectangle
+            Raylib.DrawRectangleLines(x * width, y * height, width, height, Color.BLACK); //Draw the cell outline
         }
     }
 }

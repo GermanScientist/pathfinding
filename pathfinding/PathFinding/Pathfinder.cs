@@ -62,8 +62,18 @@ namespace pathfinding {
             //Draw the cells
             for (int i = 0; i < columnsAmount; i++) {
                 for (int j = 0; j < rowsAmount; j++) {
-                    grid[i][j].DrawCell();
+                    grid[i][j].DrawCell(Color.WHITE);
                 }
+            }
+
+            //Look through the open set
+            for (int i = 0; i < openSet.Count; i++) {
+                openSet[i].DrawCell(Color.GREEN); //Draw all the cells in the open set green
+            }
+
+            //Look through the closed set
+            for (int i = 0; i < closedSet.Count; i++) {
+                closedSet[i].DrawCell(Color.RED); //Draw all the cells in the closed set red
             }
         }
     }
