@@ -2,7 +2,7 @@
 using System.Numerics;
 using Raylib_cs;
 
-namespace pathfinding {
+namespace visualizer {
     class Visualizer {
         private ProgramBase program;
 
